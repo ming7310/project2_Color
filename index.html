@@ -1,0 +1,96 @@
+<!document html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Nodejs - 電腦網頁</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="socket.io/socket.io.js" type="text/javascript"></script>
+    <style type="text/css">
+        #main {
+            display: none;
+        }
+    </style>
+    <script type="text/javascript">
+        // 用來產生類似 GUID 的字串
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+
+        function NewGuid() {
+            return (S4() + S4());
+        }
+
+        $(document).ready(function() {
+            var uri = "10.0.1.6";
+            //var page = "/phone.html";
+            var key = {
+                arr: []
+            };
+            var key_temp;
+            var count = 0;
+            key_temp = NewGuid();
+            console.log(key_temp);
+            $("#qrcode").append("<img src='http://chart.apis.google.com/chart?chs=300x300&cht=qr&chl=http://" + uri + ":8888/?key=" + key_temp + "&choe=UTF-8'/>");
+
+            // NodeJS Server
+            // 進行 connect
+            var socket = io.connect();
+            console.log("connect success");
+            // 偵聽 nodejs 事件
+            socket.on("get_response", function(b) {
+                console.log(b.key + "*******" + b.act);
+
+                switch (b.key) {
+                    // 當擁有特定 KEY 的使用者打開手機版網頁，觸發 enter 事件，就會將 qrcode 隱藏，並秀出一張圖
+                    case "entry":
+                        setTimeout(function() {
+                            //var button_run = '<input id="run" type="button" value="run" />';
+                            $("#qrcode").hide();
+                            $("#main").show();
+                            //$("#main").append(button_run);
+                            socket.emit("send_phone",{
+                                key:key_temp
+                            });
+                        }, 500);
+                        console.log('enter');
+                        break;
+
+                        // 當擁有特定 KEY 的使用者在手機版網頁中，觸發 changebg 事件，就會將網頁的背景顏色隨機變換
+                    case "change":
+                        setTimeout(function() {
+
+                            var str = "0123456789abcdef",
+                                t = "";
+                            for (j = 0; j < 6; j++) {
+                                t = t + str.charAt(Math.random() * str.length);
+                            }
+
+                            $("body").css("background-color", t);
+
+                        }, 500);
+                        console.log('ChangeBG');
+                        break;
+
+                }
+            });
+            //button event
+            $("#run").click(function() {
+                /* Act on the event */
+                socket.emit("run",{
+                    act:"run"
+                });
+                console.log('RUNning');
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <div id="qrcode"></div>
+    <!--        <div id="main"><img src="images.jpg" /></div>-->
+    <div id="main"><input id="run" type="button" value="run" /></div>
+</body>
+
+</html>

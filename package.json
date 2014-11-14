@@ -1,0 +1,23 @@
+{
+  "name": "project2_Color",
+  "version": "1.0.0",
+  "description": "project_Color",
+  "main": "router.js",
+  "dependencies": {
+    "socket.io": "^1.2.0",
+    "express": "^4.10.1",
+    "mime": "^1.2.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "npm",
+    "node",
+    "package"
+  ],
+  "author": "J.W",
+  "license": "ISC"
+}

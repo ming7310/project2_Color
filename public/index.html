@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>顏色串流</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="socket.io/socket.io.js" type="text/javascript"></script>
+    <style type="text/css">
+        #area {
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function(req,res) {
+            // NodeJS Server
+            var port = "8080";
+            //var nodejs_server = req.getRemoteAddr() + port;
+            var nodejs_server = "10.232.100.19:8080";
+            console.log(nodejs_server);
+            // 進行 connect
+            // ==========================================================================================================================
+            // 建立 Socket IO 連線
+            // =============================================================================       
+            var socket = io.connect("http://" + nodejs_server);
+            console.log("connect success");
+            // 偵聽 nodejs 事件
+            // socket.on('changecolor',function(data){
+            //     console.log(data.act);
+            //     console.log("2");
+            //     setTimeout(function() {
+            //         $("body").css('backgroud-color', '#9e89d8');
+            //     }, 1000);
+
+            //     // setTimeout(function() {
+            //     //     $("body").css('background-color', "white");
+            //     // }, 1000);
+            // });
+            var number = 0;
+            var id = 0,
+                ip = 0;
+            socket.on('usernum', function(data) {
+                /* Act on the event */
+                // [
+                //     {
+                //         id = data.number,
+                //         ip = data.ip
+                //     }
+                // ]
+
+                $('#text').html('number online : ' + data.number);
+                console.log("connection_number :" + data.number);
+                //console.log("id :"+data.id);
+                //console.log("id-3 :"+data.id[3]);
+                var loop_count = 3;
+                number = data.number;
+                //for(var i = 0;i<loop_count;i++)
+                // for (var i = 0; i < data.number; i++) {
+                //     setTimeout(function(){
+                //         $("#area").css('background-color', 'red'); 
+                //     },1000); 
+                // };
+            });
+
+            socket.on("get_response", function(b) {
+                console.log(b.act);
+                switch (b.act) {
+                    case "download":
+                        html('<a href="' + nodejs_server + '/download/images.jpg' + '">' + 'images.jpg' + '</a>');
+                        console.log('download completed11111');
+                        break;
+                    case "changebg":
+                        setTimeout(function() {
+                            $("body").css('background-color', "#9e89d8");
+                            // $("#area").css('background-color', "#9e89d8");
+                        }, 1000);
+                        console.log("ChangeBG");
+                        break;
+                    case "run":
+                        console.log("running");
+                        //for (var i = 0; i < number; i++) {
+                            //setTimeout(function() {
+                                $("#area").css('background-color', 'red');
+                                blink();
+                            //}, 500);
+                        //};
+                        break;
+                        // case "colorChange":
+                        //     for (var i = 0; i < Things.length; i++) {
+                        //         Things[i]
+                        //     };
+                        //      setTimeout(function(){
+                        //       $("#area").css('background-color', 'red'); 
+                        //      },1000); 
+
+                        //      // setTimeout(function(){
+                        //      //  $("body").css('background-color', "white"); 
+                        //      // },1000); 
+                        //   console.log("Change--COLOR");     
+                        // break;
+                }
+            });
+            //============================================
+            //var socket = io.connect("http://140.119.164.105:8080");
+            "undefined" != typeof console && console.log("user enter via mobile");
+            // ==========================================================================================================================
+
+            "undefined" != typeof console && console.log("enter mobile page");
+
+            $("#start").click(function() {
+                // $("#area").css("backgroud-color",'#4c4c96');
+                console.log("ChangeBG!!!");
+                //           "undefined" != typeof console && console.log("send change color command");
+                socket.emit("send", {
+                    key: "change",
+                    act: "changebg"
+                });
+            });
+            $("#run").click(function() {
+                /* Act on the event */
+                socket.emit("send", {
+                    act: "run"
+                });
+            });
+            $("#download").click(function() {
+                /* Act on the event */
+                //                socket.emit("send", {
+                //                    act: "download"
+                //                });
+                //        $("#download").html('<a href='+nodejs_server+'/download'+'>images.jpg</a>');
+                console.log('download completed');
+                console.log('');
+            });
+        });
+
+        function blink() {
+            //定义图片的显示和隐藏属性
+            area.style.visibility = (area.style.visibility == "hidden") ? "visible" : "hidden";
+            //每0.5秒刷新一次
+            setTimeout("blink()", 600);
+        }
+    </script>
+</head>
+
+<body>
+    <div>BETA......</div>
+    <!--<ul><a href="/download/images.jpg">images.jpg</a></ul>-->
+    <input id="download" type="button" value="download" />
+    <button><a href="/download/">images</a>
+    </button>
+    <input id="start" type="button" value="Start" />
+    <input id="run" type="button" value="run" />
+    <div id="text"></div>
+    <div id="area"></div>
+</body>
+
+</html>
